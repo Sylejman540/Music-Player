@@ -105,7 +105,7 @@
     <div class="song-title">Life Is Good</div>
     <div class="artist">Drake</div>
 
-    <!-- Ensure that 'song.mp3' is in the same directory or update the path -->
+    <!-- Single audio element that will have its src updated -->
     <audio id="song" src="media/Future.mp3"></audio>
 
     <div class="progress-container">
@@ -115,9 +115,9 @@
     <input type="range" id="progress" value="0" class="progress-bar">
 
     <div class="controls">
-      <button><i class="fas fa-backward"></i></button>
+      <button id="prevBtn"><i class="fas fa-backward"></i></button>
       <button onclick="playPause()"><i id="ctrlIcon" class="fas fa-play"></i></button>
-      <button><i class="fas fa-forward"></i></button>
+      <button id="nextBtn"><i class="fas fa-forward"></i></button>
     </div>
   </div>
 
@@ -128,11 +128,49 @@
     const currentTime = document.getElementById("currentTime");
     const totalTime = document.getElementById("totalTime");
 
+    // Playlist with track details
+    const playlist = [
+      {
+        src: "media/Future.mp3",
+        title: "Life Is Good",
+        artist: "Drake",
+        img: "media/download.jpg"
+      },
+      {
+        src: "media/Unikkatil.mp3",
+        title: "N'rrot Soms",
+        artist: "Unikkatil",
+        img: "media/download (2).jpg"
+      },
+      {
+        src: "media/Ilir Shaqiri - Bukuroshja e Prizrenit.mp3",
+        title: "Ilir Shaqiri",
+        artist: "Bukuroshja e Prizrenit",
+        img: "media/download (1).jpg"
+      }
+    ];
+
+    let currentTrackIndex = 0;
+
+    // Load a track based on index
+    function loadTrack(index) {
+      const track = playlist[index];
+      song.src = track.src;
+      document.querySelector(".song-title").textContent = track.title;
+      document.querySelector(".artist").textContent = track.artist;
+      document.querySelector(".music-player img").src = track.img;
+      song.load();
+      // Optionally auto-play the track
+      playPause();
+    }
+
+    // When the metadata is loaded, update the progress bar maximum and total time
     song.onloadedmetadata = () => {
       progress.max = song.duration;
       totalTime.textContent = formatTime(song.duration);
     };
 
+    // Toggle play/pause state
     function playPause() {
       if (song.paused) {
         song.play();
@@ -145,21 +183,44 @@
       }
     }
 
+    // Update progress bar and current time display as song plays
     song.ontimeupdate = () => {
       progress.value = song.currentTime;
       currentTime.textContent = formatTime(song.currentTime);
     };
 
+    // Allow seeking by updating currentTime when the progress bar is changed
     progress.oninput = () => {
       song.currentTime = progress.value;
     };
 
+    // Format time (in seconds) to MM:SS
     function formatTime(time) {
       let minutes = Math.floor(time / 60);
       let seconds = Math.floor(time % 60);
       if (seconds < 10) seconds = "0" + seconds;
       return `${minutes}:${seconds}`;
     }
+
+    // Navigate to the next track
+    document.getElementById("nextBtn").addEventListener("click", () => {
+      currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
+      loadTrack(currentTrackIndex);
+    });
+
+    // Navigate to the previous track
+    document.getElementById("prevBtn").addEventListener("click", () => {
+      currentTrackIndex = (currentTrackIndex - 1 + playlist.length) % playlist.length;
+      loadTrack(currentTrackIndex);
+    });
+
+    // Listen for the right arrow key press to skip to the next track
+    document.addEventListener("keydown", function(event) {
+      if (event.key === "ArrowRight") {
+        currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
+        loadTrack(currentTrackIndex);
+      }
+    });
   </script>
 </body>
 </html>
