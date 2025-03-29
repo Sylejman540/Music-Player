@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Modern Music Player</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #111;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .music-player {
+      width: 300px;
+      background: linear-gradient(145deg, #ffdada, #ffeaea);
+      border-radius: 25px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      text-align: center;
+    }
+    .music-player img {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-bottom: 15px;
+      border: 6px solid white;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+    .song-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    .artist {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 15px;
+    }
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 15px 0;
+    }
+    .controls button {
+      background: white;
+      border: none;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      font-size: 18px;
+      color: #ff4d6d;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .controls button:hover {
+      transform: scale(1.1);
+    }
+    .progress-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #444;
+      margin-bottom: 10px;
+    }
+    .progress-bar {
+      width: 100%;
+      margin: 5px 0;
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 5px;
+      background: #ccc;
+      border-radius: 5px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ff4d6d;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="music-player">
+    <!-- Updated image source to a valid image file -->
+    <img src="media/download.jpg" alt="Album Art">
+    <div class="song-title">Life Is Good</div>
+    <div class="artist">Drake</div>
+
+    <!-- Ensure that 'song.mp3' is in the same directory or update the path -->
+    <audio id="song" src="media/Future.mp3"></audio>
+
+    <div class="progress-container">
+      <span id="currentTime">0:00</span>
+      <span id="totalTime">0:00</span>
+    </div>
+    <input type="range" id="progress" value="0" class="progress-bar">
+
+    <div class="controls">
+      <button><i class="fas fa-backward"></i></button>
+      <button onclick="playPause()"><i id="ctrlIcon" class="fas fa-play"></i></button>
+      <button><i class="fas fa-forward"></i></button>
+    </div>
+  </div>
+
+  <script>
+    const song = document.getElementById("song");
+    const progress = document.getElementById("progress");
+    const ctrlIcon = document.getElementById("ctrlIcon");
+    const currentTime = document.getElementById("currentTime");
+    const totalTime = document.getElementById("totalTime");
+
+    song.onloadedmetadata = () => {
+      progress.max = song.duration;
+      totalTime.textContent = formatTime(song.duration);
+    };
+
+    function playPause() {
+      if (song.paused) {
+        song.play();
+        ctrlIcon.classList.remove("fa-play");
+        ctrlIcon.classList.add("fa-pause");
+      } else {
+        song.pause();
+        ctrlIcon.classList.remove("fa-pause");
+        ctrlIcon.classList.add("fa-play");
+      }
+    }
+
+    song.ontimeupdate = () => {
+      progress.value = song.currentTime;
+      currentTime.textContent = formatTime(song.currentTime);
+    };
+
+    progress.oninput = () => {
+      song.currentTime = progress.value;
+    };
+
+    function formatTime(time) {
+      let minutes = Math.floor(time / 60);
+      let seconds = Math.floor(time % 60);
+      if (seconds < 10) seconds = "0" + seconds;
+      return `${minutes}:${seconds}`;
+    }
+  </script>
+</body>
+</html>
